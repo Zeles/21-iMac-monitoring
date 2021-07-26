@@ -1,0 +1,24 @@
+#!/bin/bash
+Moulinette80Status=0
+nc -vz {{moulinette_host}} {{moulinette_port}} &> /dev/null
+
+if [ $? -eq 0 ]
+then
+	Moulinette80Status=1
+else
+	Moulinette80Status=0
+fi
+
+Moulinette443Status=0
+nc -vz moulinette 443 &> /dev/null
+
+if [ $? -eq 0 ]
+then
+	Moulinette443Status=1
+else
+	Moulinette443Status=0
+fi
+
+#Output
+echo iMacService,service=moulinette/80 status=$Moulinette80Status
+echo iMacService,service=moulinette/443 status=$Moulinette443Status

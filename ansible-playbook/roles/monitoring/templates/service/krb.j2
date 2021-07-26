@@ -1,0 +1,13 @@
+#!/bin/bash
+KrbStatus=0
+nc -vz {{krb_host}} {{krb_port}} &> /dev/null
+
+if [ $? -eq 0 ]
+then
+	KrbStatus=1
+else
+	KrbStatus=0
+fi
+
+#Output
+echo iMacService,service=krb status=$KrbStatus

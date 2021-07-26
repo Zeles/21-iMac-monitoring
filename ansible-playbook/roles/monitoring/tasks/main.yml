@@ -1,0 +1,60 @@
+---
+
+#Create telegraf directory#
+-   name: Directory
+    file:
+        state: directory
+        path: "{{ item.path }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+        force: "{{ item.force }}"
+    ignore_errors: yes
+    with_items:
+        - { path: "/etc/telegraf", owner: "root", group: "wheel", mode: "0700", force: "no" }
+        - { path: "/etc/telegraf/alert", owner: "root", group: "wheel", mode: "0700", force: "no" }
+        - { path: "/etc/telegraf/hardware", owner: "root", group: "wheel", mode: "0700", force: "no" }
+        - { path: "/etc/telegraf/service", owner: "root", group: "wheel", mode: "0700", force: "no" }
+
+#Sync telegraf config#
+-   name: Rsync /etc/telegraf
+    synchronize:
+        src: telegraf/
+        dest: /etc/telegraf/
+        perms: yes
+
+#Create all service monitoring
+-   name: Templates
+    template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+    with_items:
+      - { src: "service/krb.j2", dest: "/etc/telegraf/service/krb.sh", owner: "root", group: "wheel", mode: "0700" }
+      - { src: "service/ldap.j2", dest: "/etc/telegraf/service/ldap.sh", owner: "root", group: "wheel", mode: "0700" }
+      - { src: "service/storage.j2", dest: "/etc/telegraf/service/storage.sh", owner: "root", group: "wheel", mode: "0700" }
+
+#Create intra service monitoring
+-   name: Templates
+    template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+    with_items:
+      - { src: "service/moulinette.j2", dest: "/etc/telegraf/service/moulinette.sh", owner: "root", group: "wheel", mode: "0700" }
+      - { src: "service/vogsphere.j2", dest: "/etc/telegraf/service/vogsphere.sh", owner: "root", group: "wheel", mode: "0700" }
+
+#Create plist
+-   name: Create plist
+    synchronize:
+        src: ru.21-school.telegraf.plist
+        dest: /Library/LaunchDaemons/ru.21-school.telegraf.plist
+        perms: yes
+
+#Restart telegraf plist#
+-   name: Restart telegraf
+    shell: sudo launchctl unload /Library/LaunchDaemons/ru.21-school.telegraf.plist && sudo launchctl load /Library/LaunchDaemons/ru.21-school.telegraf.plist

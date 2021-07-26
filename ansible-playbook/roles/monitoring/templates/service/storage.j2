@@ -1,0 +1,13 @@
+#!/bin/bash
+iSCSiStatus=0
+nc -vz {{storage_host}} {{storage_port}} &>/dev/null
+
+if [ $? -eq 0 ]
+then
+        iSCSiStatus=1
+else
+        iSCSiStatus=0
+fi
+
+#Output
+echo iMacService,service=iscsi status=$iSCSiStatus

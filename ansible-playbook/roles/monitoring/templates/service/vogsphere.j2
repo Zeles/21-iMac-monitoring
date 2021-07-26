@@ -1,0 +1,13 @@
+#!/bin/bash
+VogsphereStatus=0
+nc -vz {{vogsphere_host}} {{vogsphere_port}} &> /dev/null
+
+if [ $? -eq 0 ]
+then
+        VogsphereStatus=1
+else
+        VogsphereStatus=0
+fi
+
+#Output
+echo iMacService,service=vogsphere status=$VogsphereStatus

@@ -1,0 +1,14 @@
+#!/bin/bash
+LdapStatus=0
+Ldap=$(cat /etc/hosts | grep {{ldap_host}})
+
+#Check ldap server
+if [ -z "$Ldap" ]
+then
+	LdapStatus=1
+else
+	LdapStatus=0
+fi
+
+#Output
+echo iMacService,service=ldap status=$LdapStatus
